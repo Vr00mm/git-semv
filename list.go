@@ -95,7 +95,7 @@ func getContent(url string) ([]byte, error) {
     client := http.Client{}
     req , err := http.NewRequest("GET", url, nil)
     if err != nil {
-        //Handle Error
+        return nil, fmt.Errorf("Cannot initiate http client: %v", err)
     }
     req.Header.Set("Accept", "application/vnd.github.v3+json")
 
