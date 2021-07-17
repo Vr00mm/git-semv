@@ -4,7 +4,7 @@
 </p>
 
 <p align="center">
-  <strong>git-semv</strong>: This is a <a href="https://git-scm.com/">Git</a> plugin for <a href="https://semver.org/">Semantic Versioning</a>.
+  <strong>git-semv</strong>: This is a <b>FORK</b> of the <a href="https://git-scm.com/">Git</a> plugin for <a href="https://semver.org/">Semantic Versioning</a>.
 </p><br><br><br><br>
 
 <p align="center">
@@ -13,7 +13,6 @@
   <a href="https://github.com/Vr00mm/git-semv/releases"><img src="http://img.shields.io/github/release/Vr00mm/git-semv.svg?style=for-the-badge" alt="GitHub Release"></a>
   <a href="https://github.com/Vr00mm/git-semv/blob/main/LICENSE"><img src="http://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge" alt="MIT License"></a>
   <a href="http://godoc.org/github.com/Vr00mm/git-semv"><img src="http://img.shields.io/badge/go-documentation-blue.svg?style=for-the-badge" alt="Go Documentation"></a>
-  <a href="https://codecov.io/gh/Vr00mm/git-semv"> <img src="https://img.shields.io/codecov/c/github/Vr00mm/git-semv.svg?style=for-the-badge" alt="codecov"></a>
 </p>
 
 The usefulness of Semantic Versioning has been accepted by OSS in advance.
@@ -32,13 +31,6 @@ Or, you can download using `go get` depending on the version of Go1.11 or higher
 
 ```sh
 $ go get -u github.com/Vr00mm/git-semv/cmd/git-semv
-```
-
-### Homebrew
-
-```sh
-$ brew tap Vr00mm/git-semv
-$ brew install git-semv
 ```
 
 Usage
