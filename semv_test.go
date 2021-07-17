@@ -1,223 +1,277 @@
 package semv
 
 import (
-	"fmt"
+	"reflect"
 	"testing"
+
+	"github.com/blang/semver"
 )
 
-type MockedCmd struct {
-	Out string
-	Err string
-}
-
-func (c MockedCmd) Do(name string, arg ...string) ([]byte, error) {
-	var err error
-	if c.Err != "" {
-		err = fmt.Errorf(c.Err)
+func TestMustNew(t *testing.T) {
+	type args struct {
+		s string
 	}
-	return []byte(c.Out), err
-}
-
-var mixed = `1.0.0
-bar-0
-foo
-v2.3.4-rc.2
-v8.8.8
-v12.0.1
-v12.3.0-alpha
-v12.3.0-alpha.0
-v12.3.0-alpha.1
-v12.3.0-alpha.1.beta
-v12.3.0-beta
-v12.3.0-beta.5
-v12.3.0-rc
-v12.344.0+20130313144700
-v12.345.66
-v12.345.67
-v13.0.0-alpha.0
-`
-
-var empty = `
-`
-
-func TestCurrent(t *testing.T) {
 	tests := []struct {
-		out  string
-		want string
+		name string
+		args args
+		want *Semv
 	}{
-		{mixed, "v12.345.67"},
-		{empty, ""},
+		// TODO: Add test cases.
 	}
-
-	for i, tt := range tests {
-		tagCmder = MockedCmd{Out: tt.out}
-		v, err := Latest()
-		if err != nil {
-			t.Fatal(err)
-		}
-		if v.String() != tt.want {
-			t.Errorf("test[%d]: out = %s, Semv = %s; want %s", i, tt.out, v, tt.want)
+	for _, tt := range tests {
+		if got := MustNew(tt.args.s); !reflect.DeepEqual(got, tt.want) {
+			t.Errorf("%q. MustNew() = %v, want %v", tt.name, got, tt.want)
 		}
 	}
 }
 
-func TestString(t *testing.T) {
+func TestLatest(t *testing.T) {
+	type args struct {
+		url string
+	}
 	tests := []struct {
-		v    *Semv
-		want string
+		name    string
+		args    args
+		want    *Semv
+		wantErr bool
 	}{
-		{&Semv{}, ""},
-		{MustNew("1.0.0"), "v1.0.0"},
+		// TODO: Add test cases.
 	}
-
-	for i, tt := range tests {
-		if tt.v.String() != tt.want {
-			t.Errorf("test[%d]: Semv(%#v) = %s; want %s", i, tt.v, tt.v, tt.want)
+	for _, tt := range tests {
+		got, err := Latest(tt.args.url)
+		if (err != nil) != tt.wantErr {
+			t.Errorf("%q. Latest() error = %v, wantErr %v", tt.name, err, tt.wantErr)
+			continue
+		}
+		if !reflect.DeepEqual(got, tt.want) {
+			t.Errorf("%q. Latest() = %v, want %v", tt.name, got, tt.want)
 		}
 	}
 }
 
-func TestNext(t *testing.T) {
-	tagCmder = MockedCmd{Out: mixed}
-	v, err := Latest()
-	if err != nil {
-		t.Fatal(err)
+func TestSemv_String(t *testing.T) {
+	type fields struct {
+		data semver.Version
+		list *List
 	}
-
 	tests := []struct {
-		target string
+		name   string
+		fields fields
 		want   string
 	}{
-		{"major", "v13.0.0"},
-		{"minor", "v12.346.0"},
-		{"patch", "v12.345.68"},
+		// TODO: Add test cases.
 	}
-
-	for i, tt := range tests {
-		vn := v.Next(tt.target)
-		if vn.String() != tt.want {
-			t.Errorf("test[%d]: Semv(%#v) = %s; want %s", i, vn, vn, tt.want)
+	for _, tt := range tests {
+		v := &Semv{
+			data: tt.fields.data,
+			list: tt.fields.list,
+		}
+		if got := v.String(); got != tt.want {
+			t.Errorf("%q. Semv.String() = %v, want %v", tt.name, got, tt.want)
 		}
 	}
 }
 
-func TestPreRelease(t *testing.T) {
-	tagCmder = MockedCmd{Out: mixed}
-	v, err := Latest()
-	if err != nil {
-		t.Fatal(err)
+func TestSemv_IsEmpty(t *testing.T) {
+	type fields struct {
+		data semver.Version
+		list *List
 	}
-
 	tests := []struct {
-		target  string
-		preName string
-		want    string
+		name   string
+		fields fields
+		want   bool
 	}{
-		{"major", "", "v13.0.0-alpha.1"},
-		{"major", "beta", "v13.0.0-beta.0"},
-		{"minor", "", "v12.346.0-alpha.0"},
-		{"minor", "beta", "v12.346.0-beta.0"},
-		{"patch", "", "v12.345.68-alpha.0"},
-		{"patch", "beta", "v12.345.68-beta.0"},
+		// TODO: Add test cases.
 	}
-
-	for i, tt := range tests {
-		vn, err := v.Next(tt.target).PreRelease(tt.preName)
-		if err != nil {
-			t.Fatal(err)
+	for _, tt := range tests {
+		v := &Semv{
+			data: tt.fields.data,
+			list: tt.fields.list,
 		}
-		if vn.String() != tt.want {
-			t.Errorf("test[%d]: target = %s; name = %s; Semv = %s; want %s", i, tt.target, tt.preName, vn, tt.want)
+		if got := v.IsEmpty(); got != tt.want {
+			t.Errorf("%q. Semv.IsEmpty() = %v, want %v", tt.name, got, tt.want)
 		}
 	}
 }
 
-func TestBuild(t *testing.T) {
-	tagCmder = MockedCmd{Out: mixed}
-	v, err := Latest()
-	if err != nil {
-		t.Fatal(err)
+func TestSemv_Next(t *testing.T) {
+	type fields struct {
+		data semver.Version
+		list *List
 	}
-
-	u := "foobar"
-	h := "2f994ff"
-	usernameCmder = MockedCmd{Out: u + "\n"}
-	latestCommitCmder = MockedCmd{Out: h + "\n"}
-
+	type args struct {
+		target string
+	}
 	tests := []struct {
-		target    string
-		buildName string
-		want      string
+		name   string
+		fields fields
+		args   args
+		want   *Semv
 	}{
-		{"major", "", "v13.0.0+" + h + "." + u},
-		{"major", "foo", "v13.0.0+foo"},
-		{"minor", "", "v12.346.0+" + h + "." + u},
-		{"minor", "bar", "v12.346.0+bar"},
-		{"patch", "", "v12.345.68+" + h + "." + u},
-		{"patch", "foo-bar", "v12.345.68+foo-bar"},
+		// TODO: Add test cases.
 	}
-
-	for i, tt := range tests {
-		vn, err := v.Next(tt.target).Build(tt.buildName)
-		if err != nil {
-			t.Fatal(err)
+	for _, tt := range tests {
+		v := &Semv{
+			data: tt.fields.data,
+			list: tt.fields.list,
 		}
-		if vn.String() != tt.want {
-			t.Errorf("test[%d]: target = %s; name = %s; Semv = %s; want %s", i, tt.target, tt.buildName, vn, tt.want)
+		if got := v.Next(tt.args.target); !reflect.DeepEqual(got, tt.want) {
+			t.Errorf("%q. Semv.Next() = %v, want %v", tt.name, got, tt.want)
 		}
 	}
 }
 
-func TestIncrementMajor(t *testing.T) {
-	tests := []struct {
-		v    *Semv
-		want string
-	}{
-		{MustNew("1.0.0"), "v2.0.0"},
-		{MustNew("1.2.3"), "v2.0.0"},
-		{MustNew("0.0.0"), "v1.0.0"},
+func TestSemv_PreRelease(t *testing.T) {
+	type fields struct {
+		data semver.Version
+		list *List
 	}
-
-	for i, tt := range tests {
-		tt.v.incrementMajor()
-		if tt.v.String() != tt.want {
-			t.Errorf("test[%d]: Semv(%#v) = %s; want %s", i, tt.v, tt.v, tt.want)
+	type args struct {
+		name string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    *Semv
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		v := &Semv{
+			data: tt.fields.data,
+			list: tt.fields.list,
+		}
+		got, err := v.PreRelease(tt.args.name)
+		if (err != nil) != tt.wantErr {
+			t.Errorf("%q. Semv.PreRelease() error = %v, wantErr %v", tt.name, err, tt.wantErr)
+			continue
+		}
+		if !reflect.DeepEqual(got, tt.want) {
+			t.Errorf("%q. Semv.PreRelease() = %v, want %v", tt.name, got, tt.want)
 		}
 	}
 }
 
-func TestIncrementMinor(t *testing.T) {
-	tests := []struct {
-		v    *Semv
-		want string
-	}{
-		{MustNew("1.0.0"), "v1.1.0"},
-		{MustNew("1.2.3"), "v1.3.0"},
-		{MustNew("0.0.0"), "v0.1.0"},
+func TestSemv_Build(t *testing.T) {
+	type fields struct {
+		data semver.Version
+		list *List
 	}
-
-	for i, tt := range tests {
-		tt.v.incrementMinor()
-		if tt.v.String() != tt.want {
-			t.Errorf("test[%d]: Semv(%#v) = %s; want %s", i, tt.v, tt.v, tt.want)
+	type args struct {
+		name string
+		url  string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    *Semv
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		v := &Semv{
+			data: tt.fields.data,
+			list: tt.fields.list,
+		}
+		got, err := v.Build(tt.args.name, tt.args.url)
+		if (err != nil) != tt.wantErr {
+			t.Errorf("%q. Semv.Build() error = %v, wantErr %v", tt.name, err, tt.wantErr)
+			continue
+		}
+		if !reflect.DeepEqual(got, tt.want) {
+			t.Errorf("%q. Semv.Build() = %v, want %v", tt.name, got, tt.want)
 		}
 	}
 }
 
-func TestIncrementPatch(t *testing.T) {
-	tests := []struct {
-		v    *Semv
-		want string
-	}{
-		{MustNew("1.0.0"), "v1.0.1"},
-		{MustNew("1.2.3"), "v1.2.4"},
-		{MustNew("0.0.0"), "v0.0.1"},
+func TestSemv_cloneForPreRelease(t *testing.T) {
+	type fields struct {
+		data semver.Version
+		list *List
 	}
-
-	for i, tt := range tests {
-		tt.v.incrementPatch()
-		if tt.v.String() != tt.want {
-			t.Errorf("test[%d]: Semv(%#v) = %s; want %s", i, tt.v, tt.v, tt.want)
+	type args struct {
+		vv *Semv
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   *Semv
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		v := &Semv{
+			data: tt.fields.data,
+			list: tt.fields.list,
 		}
+		if got := v.cloneForPreRelease(tt.args.vv); !reflect.DeepEqual(got, tt.want) {
+			t.Errorf("%q. Semv.cloneForPreRelease() = %v, want %v", tt.name, got, tt.want)
+		}
+	}
+}
+
+func TestSemv_incrementMajor(t *testing.T) {
+	type fields struct {
+		data semver.Version
+		list *List
+	}
+	tests := []struct {
+		name   string
+		fields fields
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		v := &Semv{
+			data: tt.fields.data,
+			list: tt.fields.list,
+		}
+		v.incrementMajor()
+	}
+}
+
+func TestSemv_incrementMinor(t *testing.T) {
+	type fields struct {
+		data semver.Version
+		list *List
+	}
+	tests := []struct {
+		name   string
+		fields fields
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		v := &Semv{
+			data: tt.fields.data,
+			list: tt.fields.list,
+		}
+		v.incrementMinor()
+	}
+}
+
+func TestSemv_incrementPatch(t *testing.T) {
+	type fields struct {
+		data semver.Version
+		list *List
+	}
+	tests := []struct {
+		name   string
+		fields fields
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		v := &Semv{
+			data: tt.fields.data,
+			list: tt.fields.list,
+		}
+		v.incrementPatch()
 	}
 }

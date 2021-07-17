@@ -29,19 +29,16 @@ type Env struct {
 type cli struct {
 	env       Env
 	command   string
+        RepoURL   string `long:"url" short:"u" description:"Repository URL"`
 	Pre       bool   `long:"pre" short:"p" description:"Pre-Release version indicates(ex: 0.0.1-rc.0)"`
 	PreName   string `long:"pre-name" description:"Specify pre-release version name"`
 	Build     bool   `long:"build" short:"b" description:"Build version indicates(ex: 0.0.1+3222d31.foo)"`
 	BuildName string `long:"build-name" description:"Specify build version name"`
 	All       bool   `long:"all" short:"a" description:"Include everything such as pre-release and build versions in list"`
-	Bump      bool   `long:"bump" short:"B" description:"Create tag and Push to origin"`
 	Prefix    string `long:"prefix" short:"x" description:"Prefix for version and tag(default: v)"`
 	Help      bool   `long:"help" short:"h" description:"Show this help message and exit"`
 	Version   bool   `long:"version" short:"v" description:"Prints the version number"`
 }
-
-var gitTagCmder Cmder
-var gitPushTagCmder Cmder
 
 // RunCLI runs for CLI
 func RunCLI(env Env) int {
@@ -82,12 +79,12 @@ func (c *cli) buildHelp(names []string) []string {
 
 func (c *cli) showHelp() {
 	opts := strings.Join(c.buildHelp([]string{
-		"Pre",
+		"RepoURL",
+                "Pre",
 		"PreRelease",
 		"Build",
 		"BuildName",
 		"All",
-		"Bump",
 		"Prefix",
 		"Help",
 		"Version",
@@ -112,6 +109,7 @@ Options:
 func (c *cli) run() int {
 	p := flags.NewParser(c, flags.PassDoubleDash)
 	args, err := p.ParseArgs(c.env.Args)
+
 	if err != nil {
 		fmt.Fprintf(c.env.Err, "Error: %s\n", err)
 		return ExitErr
@@ -135,7 +133,7 @@ func (c *cli) run() int {
 
 	switch c.command {
 	case "list":
-		list, err := GetList()
+		list, err := GetList("https://api.github.com/repos/" + c.RepoURL)
 		if err != nil {
 			fmt.Fprintf(c.env.Err, "Error: %s\n", err)
 		}
@@ -145,14 +143,14 @@ func (c *cli) run() int {
 		fmt.Fprintf(c.env.Out, "%s\n", list)
 
 	case "now", "latest":
-		latest, err := Latest()
+		latest, err := Latest("https://api.github.com/repos/" + c.RepoURL)
 		if err != nil {
 			fmt.Fprintf(c.env.Err, "Error: %s\n", err)
 		}
 		fmt.Fprintf(c.env.Out, "%s\n", latest)
 
 	case "major", "minor", "patch":
-		latest, err := Latest()
+		latest, err := Latest("https://api.github.com/repos/" + c.RepoURL)
 		if err != nil {
 			fmt.Fprintf(c.env.Err, "Error: %s\n", err)
 		}
@@ -161,26 +159,7 @@ func (c *cli) run() int {
 			_, _ = next.PreRelease(c.PreName)
 		}
 		if c.Build || c.BuildName != "" {
-			_, _ = next.Build(c.BuildName)
-		}
-		if c.Bump {
-			if gitTagCmder == nil {
-				gitTagCmder = Cmd{}
-			}
-			_, err = gitTagCmder.Do("git", "tag", next.String())
-			if err != nil {
-				fmt.Fprintf(c.env.Err, "Error: %s\n", err)
-				return ExitErr
-			}
-			if gitPushTagCmder == nil {
-				gitPushTagCmder = Cmd{}
-			}
-			_, err = gitPushTagCmder.Do("git", "push", "origin", next.String())
-			if err != nil {
-				fmt.Fprintf(c.env.Err, "Error: %s\n", err)
-				return ExitErr
-			}
-			fmt.Fprintf(c.env.Out, "Bumped version to %s\n", next)
+			_, _ = next.Build(c.BuildName, c.RepoURL)
 		} else {
 			fmt.Fprintf(c.env.Out, "%s\n", next)
 		}
