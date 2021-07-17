@@ -92,7 +92,9 @@ func username(url string) ([]byte, error) {
 
         var commits Commits
         json.Unmarshal(body, &commits)
-
+        if commits == nil {
+            return nil, fmt.Errorf("Body is empty: %v", nil)
+        }
         return []byte(commits[0].Commit.Author.Name), nil
 }
 
@@ -104,7 +106,9 @@ func latestCommit(url string) ([]byte, error) {
 
         var commits Commits
         json.Unmarshal(body, &commits)
-
+        if commits == nil {
+            return nil, fmt.Errorf("Body is empty: %v", nil)
+        }
         return []byte(commits[0].Sha), nil
 }
 
