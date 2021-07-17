@@ -8,12 +8,12 @@
 </p><br><br><br><br>
 
 <p align="center">
-  <a href="https://github.com/linyows/git-semv/actions/workflows/test.yml"><img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/linyows/git-semv/Test?label=Test&style=for-the-badge"></a>
-  <a href="https://github.com/linyows/git-semv/actions/workflows/build.yml"><img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/linyows/git-semv/Build%20by%20matrix?style=for-the-badge"></a>
-  <a href="https://github.com/linyows/git-semv/releases"><img src="http://img.shields.io/github/release/linyows/git-semv.svg?style=for-the-badge" alt="GitHub Release"></a>
-  <a href="https://github.com/linyows/git-semv/blob/main/LICENSE"><img src="http://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge" alt="MIT License"></a>
-  <a href="http://godoc.org/github.com/linyows/git-semv"><img src="http://img.shields.io/badge/go-documentation-blue.svg?style=for-the-badge" alt="Go Documentation"></a>
-  <a href="https://codecov.io/gh/linyows/git-semv"> <img src="https://img.shields.io/codecov/c/github/linyows/git-semv.svg?style=for-the-badge" alt="codecov"></a>
+  <a href="https://github.com/Vr00mm/git-semv/actions/workflows/test.yml"><img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/Vr00mm/git-semv/Test?label=Test&style=for-the-badge"></a>
+  <a href="https://github.com/Vr00mm/git-semv/actions/workflows/build.yml"><img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/Vr00mm/git-semv/Build%20by%20matrix?style=for-the-badge"></a>
+  <a href="https://github.com/Vr00mm/git-semv/releases"><img src="http://img.shields.io/github/release/Vr00mm/git-semv.svg?style=for-the-badge" alt="GitHub Release"></a>
+  <a href="https://github.com/Vr00mm/git-semv/blob/main/LICENSE"><img src="http://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge" alt="MIT License"></a>
+  <a href="http://godoc.org/github.com/Vr00mm/git-semv"><img src="http://img.shields.io/badge/go-documentation-blue.svg?style=for-the-badge" alt="Go Documentation"></a>
+  <a href="https://codecov.io/gh/Vr00mm/git-semv"> <img src="https://img.shields.io/codecov/c/github/Vr00mm/git-semv.svg?style=for-the-badge" alt="codecov"></a>
 </p>
 
 The usefulness of Semantic Versioning has been accepted by OSS in advance.
@@ -31,13 +31,13 @@ Download the binary in [Github Releases][release] and place it in the directory 
 Or, you can download using `go get` depending on the version of Go1.11 or higher.
 
 ```sh
-$ go get -u github.com/linyows/git-semv/cmd/git-semv
+$ go get -u github.com/Vr00mm/git-semv/cmd/git-semv
 ```
 
 ### Homebrew
 
 ```sh
-$ brew tap linyows/git-semv
+$ brew tap Vr00mm/git-semv
 $ brew install git-semv
 ```
 
@@ -117,7 +117,7 @@ Bumped version to v1.1.2
 #==> git tag v1.1.2 && git push origin v1.1.2
 ```
 
-[release]: https://github.com/linyows/git-semv/releases
+[release]: https://github.com/Vr00mm/git-semv/releases
 
 VS.
 --
@@ -158,7 +158,7 @@ And `git-semv` solves troublesome versioning and tag creation problem which is t
 Contribution
 ------------
 
-1. Fork ([https://github.com/linyows/git-semv/fork](https://github.com/linyows/git-semv/fork))
+1. Fork ([https://github.com/Vr00mm/git-semv/fork](https://github.com/Vr00mm/git-semv/fork))
 1. Create a feature branch
 1. Commit your changes
 1. Rebase your local changes against the master branch
