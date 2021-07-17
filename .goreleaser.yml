@@ -36,7 +36,7 @@ brews:
       owner: linyows
       name: homebrew-git-semv
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
-    homepage: https://github.com/linyows/git-semv
+    homepage: https://github.com/Vr00mm/git-semv/tree/main
     description: This is a Git plugin for Semantic Versioning.
     license: "MIT"
     dependencies:
