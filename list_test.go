@@ -1,75 +1,181 @@
 package semv
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/blang/semver"
 )
 
 func TestGetList(t *testing.T) {
-	want := `v2.3.4-rc.2
-v8.8.8
-v12.0.1
-v12.3.0-alpha
-v12.3.0-alpha.0
-v12.3.0-alpha.1
-v12.3.0-alpha.1.beta
-v12.3.0-beta
-v12.3.0-beta.5
-v12.3.0-rc
-v12.344.0+20130313144700
-v12.345.66
-v12.345.67
-v13.0.0-alpha.0`
-
 	tests := []struct {
-		out  string
-		want string
+		name    string
+		want    *List
+		wantErr bool
 	}{
-		{mixed, want},
-		{empty, ""},
+		// TODO: Add test cases.
 	}
-
-	for i, tt := range tests {
-		tagCmder = MockedCmd{Out: tt.out}
-		l, err := GetList()
-		if err != nil {
-			t.Fatal(err)
+	for _, tt := range tests {
+		got, err := GetList()
+		if (err != nil) != tt.wantErr {
+			t.Errorf("%q. GetList() error = %v, wantErr %v", tt.name, err, tt.wantErr)
+			continue
 		}
-		if l.String() != tt.want {
-			t.Errorf("test[%d]: List = %s; want %s", i, l, tt.want)
+		if !reflect.DeepEqual(got, tt.want) {
+			t.Errorf("%q. GetList() = %v, want %v", tt.name, got, tt.want)
 		}
 	}
 }
 
-func TestFindSimilar(t *testing.T) {
-	out := `v1.0.0
-v1.0.1
-v1.0.2-rc.0`
-
-	tests := []struct {
-		out  string
-		find string
-		want string
-	}{
-		{out, "v1.0.2", "v1.0.2-rc.0"},
-		{out, "v1.0.3", ""},
-		{"", "v1.0.3", ""},
+func TestList_FindSimilar(t *testing.T) {
+	type fields struct {
+		data semver.Versions
 	}
+	type args struct {
+		v semver.Version
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   *Semv
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		l := &List{
+			data: tt.fields.data,
+		}
+		if got := l.FindSimilar(tt.args.v); !reflect.DeepEqual(got, tt.want) {
+			t.Errorf("%q. List.FindSimilar() = %v, want %v", tt.name, got, tt.want)
+		}
+	}
+}
 
-	for i, tt := range tests {
-		tagCmder = MockedCmd{Out: tt.out}
-		l, err := GetList()
-		if err != nil {
-			t.Fatal(err)
+func TestList_String(t *testing.T) {
+	type fields struct {
+		data semver.Versions
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   string
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		l := &List{
+			data: tt.fields.data,
 		}
-		v, err := semver.ParseTolerant(tt.find)
-		if err != nil {
-			t.Fatal(err)
+		if got := l.String(); got != tt.want {
+			t.Errorf("%q. List.String() = %v, want %v", tt.name, got, tt.want)
 		}
-		semv := l.FindSimilar(v)
-		if semv.String() != tt.want {
-			t.Errorf("test[%d]: semver.Version = %s; want %s", i, semv, tt.want)
+	}
+}
+
+func TestList_Latest(t *testing.T) {
+	type fields struct {
+		data semver.Versions
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   *Semv
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		l := &List{
+			data: tt.fields.data,
+		}
+		if got := l.Latest(); !reflect.DeepEqual(got, tt.want) {
+			t.Errorf("%q. List.Latest() = %v, want %v", tt.name, got, tt.want)
+		}
+	}
+}
+
+func TestList_WithoutPreRelease(t *testing.T) {
+	type fields struct {
+		data semver.Versions
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   *List
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		l := &List{
+			data: tt.fields.data,
+		}
+		if got := l.WithoutPreRelease(); !reflect.DeepEqual(got, tt.want) {
+			t.Errorf("%q. List.WithoutPreRelease() = %v, want %v", tt.name, got, tt.want)
+		}
+	}
+}
+
+func TestList_OnlyPreRelease(t *testing.T) {
+	type fields struct {
+		data semver.Versions
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   *List
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		l := &List{
+			data: tt.fields.data,
+		}
+		if got := l.OnlyPreRelease(); !reflect.DeepEqual(got, tt.want) {
+			t.Errorf("%q. List.OnlyPreRelease() = %v, want %v", tt.name, got, tt.want)
+		}
+	}
+}
+
+func Test_getContent(t *testing.T) {
+	type args struct {
+		url string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		got, err := getContent(tt.args.url)
+		if (err != nil) != tt.wantErr {
+			t.Errorf("%q. getContent() error = %v, wantErr %v", tt.name, err, tt.wantErr)
+			continue
+		}
+		if !reflect.DeepEqual(got, tt.want) {
+			t.Errorf("%q. getContent() = %v, want %v", tt.name, got, tt.want)
+		}
+	}
+}
+
+func Test_getVersions(t *testing.T) {
+	tests := []struct {
+		name    string
+		want    semver.Versions
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		got, err := getVersions()
+		if (err != nil) != tt.wantErr {
+			t.Errorf("%q. getVersions() error = %v, wantErr %v", tt.name, err, tt.wantErr)
+			continue
+		}
+		if !reflect.DeepEqual(got, tt.want) {
+			t.Errorf("%q. getVersions() = %v, want %v", tt.name, got, tt.want)
 		}
 	}
 }

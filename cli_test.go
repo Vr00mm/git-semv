@@ -1,143 +1,142 @@
 package semv
 
 import (
-	"bytes"
+	"reflect"
 	"testing"
 )
 
-func TestCLIRun(t *testing.T) {
-	ver := `git-semv version dev [none, unknown]
-`
-	help := `
-Usage: git-semv [--version] [--help] command <options>
-
-Commands:
-  list               Sorted versions
-  now, latest        Latest version
-  major              Next major version: vX.0.0
-  minor              Next minor version: v0.X.0
-  patch              Next patch version: v0.0.X
-
-Options:
-  -p, --pre          Pre-Release version indicates(ex: 0.0.1-rc.0)
-  -b, --build        Build version indicates(ex: 0.0.1+3222d31.foo)
-      --build-name   Specify build version name
-  -a, --all          Include everything such as pre-release and build versions in list
-  -B, --bump         Create tag and Push to origin
-  -x, --prefix       Prefix for version and tag(default: v)
-  -h, --help         Show this help message and exit
-  -v, --version      Prints the version number
-`
-	unknownFlag := "Error: unknown flag `unknown'\n"
-	unknownCmd := `Error: command is not available: unknown
-`
-
-	semvers := `v8.8.8
-v12.0.1
-v12.344.0+20130313144700
-v12.345.66
-v12.345.67
-`
-
-	semversWithPre := `v2.3.4-rc.2
-v8.8.8
-v12.0.1
-v12.3.0-alpha
-v12.3.0-alpha.0
-v12.3.0-alpha.1
-v12.3.0-alpha.1.beta
-v12.3.0-beta
-v12.3.0-beta.5
-v12.3.0-rc
-v12.344.0+20130313144700
-v12.345.66
-v12.345.67
-v13.0.0-alpha.0
-`
-
-	tests := []struct {
-		cmd   []string
-		wantO []byte
-		wantE []byte
-		wantS int
-	}{
-		// list
-		{[]string{}, []byte(semvers), []byte(""), ExitOK},
-		{[]string{"list"}, []byte(semvers), []byte(""), ExitOK},
-		{[]string{"-a"}, []byte(semversWithPre), []byte(""), ExitOK},
-		{[]string{"--all"}, []byte(semversWithPre), []byte(""), ExitOK},
-		{[]string{"list", "-a"}, []byte(semversWithPre), []byte(""), ExitOK},
-		{[]string{"list", "--all"}, []byte(semversWithPre), []byte(""), ExitOK},
-		// now
-		{[]string{"now"}, []byte("v12.345.67\n"), []byte(""), ExitOK},
-		{[]string{"latest"}, []byte("v12.345.67\n"), []byte(""), ExitOK},
-		// next
-		{[]string{"major"}, []byte("v13.0.0\n"), []byte(""), ExitOK},
-		{[]string{"minor"}, []byte("v12.346.0\n"), []byte(""), ExitOK},
-		{[]string{"patch"}, []byte("v12.345.68\n"), []byte(""), ExitOK},
-		// pre
-		{[]string{"major", "-p"}, []byte("v13.0.0-alpha.1\n"), []byte(""), ExitOK},
-		{[]string{"major", "--pre"}, []byte("v13.0.0-alpha.1\n"), []byte(""), ExitOK},
-		{[]string{"minor", "--pre"}, []byte("v12.346.0-alpha.0\n"), []byte(""), ExitOK},
-		{[]string{"patch", "--pre"}, []byte("v12.345.68-alpha.0\n"), []byte(""), ExitOK},
-		{[]string{"major", "--pre-name", "rc"}, []byte("v13.0.0-rc.0\n"), []byte(""), ExitOK},
-		// build
-		{[]string{"major", "-b"}, []byte("v13.0.0+2f994ff.foobar\n"), []byte(""), ExitOK},
-		{[]string{"major", "--build"}, []byte("v13.0.0+2f994ff.foobar\n"), []byte(""), ExitOK},
-		{[]string{"minor", "--build"}, []byte("v12.346.0+2f994ff.foobar\n"), []byte(""), ExitOK},
-		{[]string{"patch", "--build"}, []byte("v12.345.68+2f994ff.foobar\n"), []byte(""), ExitOK},
-		{[]string{"major", "--build-name", "baz"}, []byte("v13.0.0+baz\n"), []byte(""), ExitOK},
-		// bump
-		{[]string{"major", "--bump"}, []byte("Bumped version to v13.0.0\n"), []byte(""), ExitOK},
-		// options
-		{[]string{"-h"}, []byte(help), []byte(""), ExitErr},
-		{[]string{"--help"}, []byte(help), []byte(""), ExitErr},
-		{[]string{"-v"}, []byte(""), []byte(ver), ExitOK},
-		{[]string{"--version"}, []byte(""), []byte(ver), ExitOK},
-		// unknown
-		{[]string{"--unknown=abc"}, []byte(""), []byte(unknownFlag), ExitErr},
-		{[]string{"unknown"}, []byte(help), []byte(unknownCmd), ExitErr},
+func TestRunCLI(t *testing.T) {
+	type args struct {
+		env Env
 	}
-
-	tagCmder = MockedCmd{Out: mixed}
-	usernameCmder = MockedCmd{Out: "foobar\n", Err: ""}
-	latestCommitCmder = MockedCmd{Out: "2f994ff\n", Err: ""}
-	gitTagCmder = MockedCmd{Out: "", Err: ""}
-	gitPushTagCmder = MockedCmd{Out: "", Err: ""}
-
-	for i, tt := range tests {
-		out, err := new(bytes.Buffer), new(bytes.Buffer)
-		env := Env{Out: out, Err: err, Args: tt.cmd, Version: "dev", Commit: "none", Date: "unknown"}
-		cli := &cli{env: env}
-		status := cli.run()
-
-		if status != tt.wantS {
-			t.Errorf("test[%d]: status = %d; want %d", i, status, tt.wantS)
-		}
-
-		if !bytes.Equal(tt.wantO, out.Bytes()) {
-			t.Errorf("test[%d]: stdout = %s; want %s", i, out, tt.wantO)
-		}
-
-		if !bytes.Equal(tt.wantE, err.Bytes()) {
-			t.Errorf("test[%d]: stderr = %s; want %s", i, err, tt.wantE)
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		if got := RunCLI(tt.args.env); got != tt.want {
+			t.Errorf("%q. RunCLI() = %v, want %v", tt.name, got, tt.want)
 		}
 	}
 }
 
-func TestRunCLI(t *testing.T) {
-	ver := "git-semv version dev [none, unknown]\n"
-	out, err := new(bytes.Buffer), new(bytes.Buffer)
-	args := []string{"-v"}
-	env := Env{Out: out, Err: err, Args: args, Version: "dev", Commit: "none", Date: "unknown"}
-	status := RunCLI(env)
-	if status != 0 {
-		t.Errorf("exit status = %d; want 0", status)
+func Test_cli_buildHelp(t *testing.T) {
+	type fields struct {
+		env       Env
+		command   string
+		Pre       bool
+		PreName   string
+		Build     bool
+		BuildName string
+		All       bool
+		Prefix    string
+		Help      bool
+		Version   bool
 	}
-	if !bytes.Equal([]byte(""), out.Bytes()) {
-		t.Errorf("output = %s; want empty", out)
+	type args struct {
+		names []string
 	}
-	if !bytes.Equal([]byte(ver), err.Bytes()) {
-		t.Errorf("err = %v; want %s", err, ver)
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   []string
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		c := &cli{
+			env:       tt.fields.env,
+			command:   tt.fields.command,
+			Pre:       tt.fields.Pre,
+			PreName:   tt.fields.PreName,
+			Build:     tt.fields.Build,
+			BuildName: tt.fields.BuildName,
+			All:       tt.fields.All,
+			Prefix:    tt.fields.Prefix,
+			Help:      tt.fields.Help,
+			Version:   tt.fields.Version,
+		}
+		if got := c.buildHelp(tt.args.names); !reflect.DeepEqual(got, tt.want) {
+			t.Errorf("%q. cli.buildHelp() = %v, want %v", tt.name, got, tt.want)
+		}
+	}
+}
+
+func Test_cli_showHelp(t *testing.T) {
+	type fields struct {
+		env       Env
+		command   string
+		Pre       bool
+		PreName   string
+		Build     bool
+		BuildName string
+		All       bool
+		Prefix    string
+		Help      bool
+		Version   bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		c := &cli{
+			env:       tt.fields.env,
+			command:   tt.fields.command,
+			Pre:       tt.fields.Pre,
+			PreName:   tt.fields.PreName,
+			Build:     tt.fields.Build,
+			BuildName: tt.fields.BuildName,
+			All:       tt.fields.All,
+			Prefix:    tt.fields.Prefix,
+			Help:      tt.fields.Help,
+			Version:   tt.fields.Version,
+		}
+		c.showHelp()
+	}
+}
+
+func Test_cli_run(t *testing.T) {
+	type fields struct {
+		env       Env
+		command   string
+		Pre       bool
+		PreName   string
+		Build     bool
+		BuildName string
+		All       bool
+		Prefix    string
+		Help      bool
+		Version   bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   int
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		c := &cli{
+			env:       tt.fields.env,
+			command:   tt.fields.command,
+			Pre:       tt.fields.Pre,
+			PreName:   tt.fields.PreName,
+			Build:     tt.fields.Build,
+			BuildName: tt.fields.BuildName,
+			All:       tt.fields.All,
+			Prefix:    tt.fields.Prefix,
+			Help:      tt.fields.Help,
+			Version:   tt.fields.Version,
+		}
+		if got := c.run(); got != tt.want {
+			t.Errorf("%q. cli.run() = %v, want %v", tt.name, got, tt.want)
+		}
 	}
 }

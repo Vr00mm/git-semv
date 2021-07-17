@@ -1,16 +1,16 @@
 package semv
 
 import (
-	"bytes"
 	"strings"
-
+        "fmt"
+        "net/http"
 	"github.com/blang/semver"
+        "encoding/json"
+        "io/ioutil"
 )
 
 // TagCmd for tag list
-var TagCmd = []string{"tag", "--list", "--sort=v:refname"}
 var git = "git"
-var tagCmder Cmder
 var defaultVersion = "0.0.0"
 
 // List struct
@@ -79,32 +79,65 @@ func (l *List) OnlyPreRelease() *List {
 	return &List{data: list}
 }
 
+
+type Tags []struct {
+	Name       string `json:"name"`
+	ZipballURL string `json:"zipball_url"`
+	TarballURL string `json:"tarball_url"`
+	Commit     struct {
+		Sha string `json:"sha"`
+		URL string `json:"url"`
+	} `json:"commit"`
+	NodeID string `json:"node_id"`
+}
+
+func getContent(url string) ([]byte, error) {
+    client := http.Client{}
+    req , err := http.NewRequest("GET", url, nil)
+    if err != nil {
+        //Handle Error
+    }
+    req.Header.Set("Accept", "application/vnd.github.v3+json")
+
+    resp , err := client.Do(req)
+    if err != nil {
+        return nil, fmt.Errorf("GET error: %v", err)
+    }
+    defer resp.Body.Close()
+
+    if resp.StatusCode != http.StatusOK {
+        return nil, fmt.Errorf("Status error: %v", resp.StatusCode)
+    }
+
+    data, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        return nil, fmt.Errorf("Read body: %v", err)
+    }
+
+    return data, nil
+}
+
 // getVersions executes git tag as command
 func getVersions() (semver.Versions, error) {
-	if tagCmder == nil {
-		tagCmder = Cmd{}
-	}
 
-	b, err := tagCmder.Do(git, TagCmd...)
-	if err != nil {
-		return nil, err
-	}
-	b = bytes.TrimSpace(b)
+        body, err := getContent("https://api.github.com/repos/Vr00mm/github-action-semver/tags")
+        if err != nil {
+            return nil, fmt.Errorf("Request error: %v", err)
+        }
 
-	vv := []string{defaultVersion}
-	if len(b) > 0 {
-		vv = strings.Split(string(b), "\n")
-	}
+        var tags Tags
+        json.Unmarshal(body, &tags)
+
 
 	var list semver.Versions
-	for _, v := range vv {
+	for i := 0; i < len(tags); i++  {
 		if defaultTagPrefix != "" {
-			trimmed := strings.TrimPrefix(v, defaultTagPrefix)
-			if trimmed == v {
+			trimmed := strings.TrimPrefix(tags[i].Name, defaultTagPrefix)
+			if trimmed == tags[i].Name {
 				continue
 			}
 		}
-		sv, err := semver.ParseTolerant(v)
+		sv, err := semver.ParseTolerant(tags[i].Name)
 		if err != nil {
 			continue
 		}
