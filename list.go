@@ -10,7 +10,6 @@ import (
 )
 
 // TagCmd for tag list
-var git = "git"
 var defaultVersion = "0.0.0"
 
 // List struct
@@ -127,8 +126,10 @@ func getVersions(url string) (semver.Versions, error) {
         }
 
         var tags Tags
-        json.Unmarshal(body, &tags)
-
+        err := json.Unmarshal(body, &tags)
+        if err != nil {
+            return nil, fmt.Errorf("Request error: %v", err)
+        }
 
 	var list semver.Versions
 	for i := 0; i < len(tags); i++  {
