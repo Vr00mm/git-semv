@@ -59,7 +59,7 @@ v1.1.1
 $ git semv -a
 v0.0.1
 v0.0.2
-v1.0.0-alpha.0+a2a784b.linyows
+v1.0.0-alpha.0+a2a784b.Vr00mm
 v1.0.0-beta.0+ba8a247.foobar
 v1.0.0-rc.0
 v1.0.0-rc.1
@@ -105,7 +105,7 @@ v2.0.0-beta.0
 
 # Next minor version with build info
 $ git semv minor --build
-v1.2.0+9125b23.linyows
+v1.2.0+9125b23.Vr00mm
 
 # Specify build name
 $ git semv minor --build-name superproject
@@ -169,4 +169,4 @@ Contribution
 Author
 --
 
-[linyows](https://github.com/linyows)
+[Vr00mm](https://github.com/Vr00mm)
