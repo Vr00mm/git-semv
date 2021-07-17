@@ -19,8 +19,8 @@ type List struct {
 }
 
 // GetList returns List
-func GetList() (*List, error) {
-	list, err := getVersions()
+func GetList(url string) (*List, error) {
+	list, err := getVersions(url)
 	if err != nil {
 		return nil, err
 	}
@@ -92,6 +92,7 @@ type Tags []struct {
 }
 
 func getContent(url string) ([]byte, error) {
+
     client := http.Client{}
     req , err := http.NewRequest("GET", url, nil)
     if err != nil {
@@ -118,9 +119,9 @@ func getContent(url string) ([]byte, error) {
 }
 
 // getVersions executes git tag as command
-func getVersions() (semver.Versions, error) {
+func getVersions(url string) (semver.Versions, error) {
 
-        body, err := getContent("https://api.github.com/repos/Vr00mm/github-action-semver/tags")
+        body, err := getContent(url + "/tags")
         if err != nil {
             return nil, fmt.Errorf("Request error: %v", err)
         }

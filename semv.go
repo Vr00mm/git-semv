@@ -26,8 +26,8 @@ func MustNew(s string) *Semv {
 }
 
 // Latest returns latest version
-func Latest() (*Semv, error) {
-	list, err := GetList()
+func Latest(url string) (*Semv, error) {
+	list, err := GetList(url)
 	if err != nil {
 		return nil, err
 	}
@@ -118,9 +118,9 @@ func (v *Semv) PreRelease(name string) (*Semv, error) {
 }
 
 // Build retuns
-func (v *Semv) Build(name string) (*Semv, error) {
+func (v *Semv) Build(name string, url string) (*Semv, error) {
 	if name == "" {
-		m, err := meta()
+		m, err := meta(url)
 		if err != nil {
 			return nil, err
 		}

@@ -84,8 +84,8 @@ type Commits []struct {
 	} `json:"parents"`
 }
 
-func username() ([]byte, error) {
-        body, err := getContent("https://api.github.com/repos/Vr00mm/github-action-semver/commits?per_page=1")
+func username(url string) ([]byte, error) {
+        body, err := getContent(url)
         if err != nil {
             return nil, fmt.Errorf("Request error: %v", err)
         }
@@ -96,8 +96,8 @@ func username() ([]byte, error) {
         return []byte(commits[0].Commit.Author.Name), nil
 }
 
-func latestCommit() ([]byte, error) {
-        body, err := getContent("https://api.github.com/repos/Vr00mm/github-action-semver/commits?per_page=1")
+func latestCommit(url string) ([]byte, error) {
+        body, err := getContent(url)
         if err != nil {
             return nil, fmt.Errorf("Request error: %v", err)
         }
@@ -108,13 +108,13 @@ func latestCommit() ([]byte, error) {
         return []byte(commits[0].Sha), nil
 }
 
-func meta() ([]string, error) {
-	user, err := username()
+func meta(url string) ([]string, error) {
+	user, err := username(url)
 	if err != nil {
 		return nil, err
 	}
 
-	hash, err := latestCommit()
+	hash, err := latestCommit(url)
 	if err != nil {
 		return nil, err
 	}
