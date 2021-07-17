@@ -12,7 +12,7 @@
   <a href="https://github.com/Vr00mm/git-semv/actions/workflows/build.yml"><img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/Vr00mm/git-semv/Build%20by%20matrix?style=for-the-badge"></a>
   <a href="https://github.com/Vr00mm/git-semv/releases"><img src="http://img.shields.io/github/release/Vr00mm/git-semv.svg?style=for-the-badge" alt="GitHub Release"></a>
   <a href="https://github.com/Vr00mm/git-semv/blob/main/LICENSE"><img src="http://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge" alt="MIT License"></a>
-  <a href="http://godoc.org/github.com/Vr00mm/git-semv"><img src="http://img.shields.io/badge/go-documentation-blue.svg?style=for-the-badge" alt="Go Documentation"></a>
+  <a href="http://godoc.org/github.com/vr00mm/git-semv"><img src="http://img.shields.io/badge/go-documentation-blue.svg?style=for-the-badge" alt="Go Documentation"></a>
 </p>
 
 The usefulness of Semantic Versioning has been accepted by OSS in advance.
