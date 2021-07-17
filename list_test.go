@@ -8,15 +8,19 @@ import (
 )
 
 func TestGetList(t *testing.T) {
+	type args struct {
+		url string
+	}
 	tests := []struct {
 		name    string
+		args    args
 		want    *List
 		wantErr bool
 	}{
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
-		got, err := GetList()
+		got, err := GetList(tt.args.url)
 		if (err != nil) != tt.wantErr {
 			t.Errorf("%q. GetList() error = %v, wantErr %v", tt.name, err, tt.wantErr)
 			continue
@@ -161,15 +165,19 @@ func Test_getContent(t *testing.T) {
 }
 
 func Test_getVersions(t *testing.T) {
+	type args struct {
+		url string
+	}
 	tests := []struct {
 		name    string
+		args    args
 		want    semver.Versions
 		wantErr bool
 	}{
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
-		got, err := getVersions()
+		got, err := getVersions(tt.args.url)
 		if (err != nil) != tt.wantErr {
 			t.Errorf("%q. getVersions() error = %v, wantErr %v", tt.name, err, tt.wantErr)
 			continue

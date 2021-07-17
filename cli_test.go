@@ -27,6 +27,7 @@ func Test_cli_buildHelp(t *testing.T) {
 	type fields struct {
 		env       Env
 		command   string
+		RepoURL   string
 		Pre       bool
 		PreName   string
 		Build     bool
@@ -51,6 +52,7 @@ func Test_cli_buildHelp(t *testing.T) {
 		c := &cli{
 			env:       tt.fields.env,
 			command:   tt.fields.command,
+			RepoURL:   tt.fields.RepoURL,
 			Pre:       tt.fields.Pre,
 			PreName:   tt.fields.PreName,
 			Build:     tt.fields.Build,
@@ -70,6 +72,7 @@ func Test_cli_showHelp(t *testing.T) {
 	type fields struct {
 		env       Env
 		command   string
+		RepoURL   string
 		Pre       bool
 		PreName   string
 		Build     bool
@@ -89,6 +92,7 @@ func Test_cli_showHelp(t *testing.T) {
 		c := &cli{
 			env:       tt.fields.env,
 			command:   tt.fields.command,
+			RepoURL:   tt.fields.RepoURL,
 			Pre:       tt.fields.Pre,
 			PreName:   tt.fields.PreName,
 			Build:     tt.fields.Build,
@@ -106,6 +110,7 @@ func Test_cli_run(t *testing.T) {
 	type fields struct {
 		env       Env
 		command   string
+		RepoURL   string
 		Pre       bool
 		PreName   string
 		Build     bool
@@ -126,6 +131,7 @@ func Test_cli_run(t *testing.T) {
 		c := &cli{
 			env:       tt.fields.env,
 			command:   tt.fields.command,
+			RepoURL:   tt.fields.RepoURL,
 			Pre:       tt.fields.Pre,
 			PreName:   tt.fields.PreName,
 			Build:     tt.fields.Build,

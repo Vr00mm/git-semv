@@ -26,15 +26,19 @@ func TestMustNew(t *testing.T) {
 }
 
 func TestLatest(t *testing.T) {
+	type args struct {
+		url string
+	}
 	tests := []struct {
 		name    string
+		args    args
 		want    *Semv
 		wantErr bool
 	}{
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
-		got, err := Latest()
+		got, err := Latest(tt.args.url)
 		if (err != nil) != tt.wantErr {
 			t.Errorf("%q. Latest() error = %v, wantErr %v", tt.name, err, tt.wantErr)
 			continue
@@ -158,6 +162,7 @@ func TestSemv_Build(t *testing.T) {
 	}
 	type args struct {
 		name string
+		url  string
 	}
 	tests := []struct {
 		name    string
@@ -173,7 +178,7 @@ func TestSemv_Build(t *testing.T) {
 			data: tt.fields.data,
 			list: tt.fields.list,
 		}
-		got, err := v.Build(tt.args.name)
+		got, err := v.Build(tt.args.name, tt.args.url)
 		if (err != nil) != tt.wantErr {
 			t.Errorf("%q. Semv.Build() error = %v, wantErr %v", tt.name, err, tt.wantErr)
 			continue
