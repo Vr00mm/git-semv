@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	semv "github.com/Vr00mm/git-semv"
+	semv "github.com/vr00mm/git-semv"
 )
 
 var (
