@@ -126,9 +126,9 @@ func getVersions(url string) (semver.Versions, error) {
         }
 
         var tags Tags
-        json.Unmarshal(body, &tags)
-        if body == nil {
-            return nil, fmt.Errorf("Empty body %v", nil)
+        err = json.Unmarshal(body, &tags)
+        if err != nil {
+            return nil, fmt.Errorf("Cannot Unmarshal tags: %v", err)
         }
 
 	var list semver.Versions
